@@ -1,12 +1,8 @@
-language: php
-dist: trusty
-sudo: false
-
-php:
-  - 7.0
-  - 7.1
-  - 7.2
-  - 7.3
+before_install:
+  - echo 'sendmail_path = /bin/true' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+  - phpenv config-rm xdebug.ini
+  - composer --verbose self-update --$COMPOSER_CHANNEL
+  - composer --version
 
 env:
   global:
@@ -16,15 +12,30 @@ env:
     - RELEASE=stable COMPOSER_CHANNEL=stable
     - RELEASE=stable COMPOSER_CHANNEL=snapshot
 
-before_install:
-  - echo 'sendmail_path = /bin/true' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
-  - phpenv config-rm xdebug.ini
-  - composer --verbose self-update --$COMPOSER_CHANNEL
-  - composer --version
-
 install:
   - composer --verbose validate
   - composer --verbose install
+
+jobs:
+  include:
+    - stage: lint
+      php: 7.3
+      env: {}
+      script:
+        - source /home/travis/virtualenv/python3.6/bin/activate
+        - pip install pre-commit
+        - pre-commit run -a
+    - stage: test
+
+language: php
+dist: trusty
+sudo: false
+
+php:
+  - 7.0
+  - 7.1
+  - 7.2
+  - 7.3
 
 script:
   - cd $TRAVIS_BUILD_DIR/web
@@ -37,3 +48,7 @@ script:
   - ./../vendor/bin/phpunit -c core --testsuite unit --exclude-group Composer,DependencyInjection,PageCache,Setup
   - ./../vendor/bin/drush
   - if [[ $RELEASE = stable ]]; then ./../vendor/bin/drupal; fi;
+
+stages:
+  - lint
+  - test
