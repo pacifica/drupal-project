@@ -17,10 +17,16 @@ First you need to [install composer](https://getcomposer.org/doc/00-intro.md#ins
 You might need to replace `composer` with `php composer.phar` (or similar)
 for your setup.
 
-After that you can create the project:
+After that you can create the project in one of two ways.
 
+For site building using the versioned code:
 ```
 composer create-project pacifica/drupal-project:8.x-dev some-dir --no-interaction
+```
+
+For developing new platform features and keep git repositories:
+```
+composer create-project pacifica/drupal-project:8.x-vcs-dev some-dir --no-interaction --keep-vcs
 ```
 
 With `composer require ...` you can download new dependencies to your
@@ -46,7 +52,7 @@ When installing the given `composer.json` some tasks are taken care of:
 * Theme (packages of type `drupal-theme`) will be placed in `web/themes/contrib/`
 * Profiles (packages of type `drupal-profile`) will be placed in `web/profiles/contrib/`
 * Creates default writable versions of `settings.php` and `services.yml`.
-* Creates `web/sites/default/files`-directory.
+* Creates `web/sites/default/files` directory.
 * Latest version of drush is installed locally for use at `vendor/bin/drush`.
 * Latest version of DrupalConsole is installed locally for use at `vendor/bin/drupal`.
 * Creates environment variables based on your .env file. See [.env.example](.env.example).
