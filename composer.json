@@ -67,6 +67,11 @@
             "type": "vcs",
             "url": "https://github.com/pacifica/pacifica-drupal-module.git"
         },
+        "pacifica-profiles-dev": {
+            "no-api": true,
+            "type": "vcs",
+            "url": "https://github.com/pacifica/pacifica-drupal-profiles.git"
+        },
         "pacifica-theme-dev": {
             "no-api": true,
             "type": "vcs",
@@ -82,6 +87,7 @@
         "drupal/core": "^8.7.0",
         "drush/drush": "^9.0.0",
         "pacifica/pacifica": "dev-8.x-1.x",
+        "pacifica/pacifica_profiles": "dev-8.x-1.x",
         "pacifica/pacifica_theme": "dev-8.x-1.x",
         "vlucas/phpdotenv": "^2.4",
         "webflo/drupal-finder": "^1.0.0",
