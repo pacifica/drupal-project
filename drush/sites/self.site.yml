@@ -12,3 +12,9 @@
 #  user: www-admin
 #  root: /path/to/drupal
 #  uri: http://stage.example.com
+
+# Local Docker container from Composer scripts.
+docker:
+  uri: http://localhost:8080/
+  root: .
+  db-url: mysql://drupal:drupal@127.0.0.1:3306/drupal

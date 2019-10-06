@@ -1,0 +1,41 @@
+---
+hostname_configure: false
+firewall_enabled: false
+installed_extras:
+  - adminer
+  - drupalconsole
+  - drush
+  - java
+  - mailhog
+  - memcached
+  - pimpmylog
+  - solr
+  - varnish
+
+extra_packages:
+  - rsync
+  - sqlite
+  - vim
+
+# Don't build or install Drupal inside the container.
+drupal_build_makefile: false
+drupal_build_composer: false
+drupal_build_composer_project: false
+drupal_install_site: false
+
+solr_version: "7.7.2"
+solr_xms: "1024M"
+solr_xmx: "2048M"
+
+php_apc_shm_size: "1024M"
+php_memory_limit: "4096M"
+php_upload_max_filesize: "4096M"
+php_post_max_size: "4096M"
+
+mysql_max_connections: 200
+mysql_max_allowed_packet: 2048M
+mysql_query_cache_limit: 1024M
+mysql_query_cache_size: 256M
+mysql_query_cache_type: 1
+mysql_innodb_buffer_pool_size: 128M
+mysql_innodb_flush_method: O_DIRECT
