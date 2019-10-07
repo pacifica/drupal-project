@@ -126,7 +126,7 @@
             "@configure-drupal-vm"
         ],
         "start-drupal-vm": [
-            "php -r \"shell_exec('docker run --name drupal-vm -p 3306:3306 -p 8080:81 -d -v /sys/fs/cgroup:/sys/fs/cgroup:ro --privileged -v '.getcwd().':/var/www/drupalvm/drupal:ro geerlingguy/drupal-vm');\""
+            "php -r \"shell_exec('docker run --name drupal-vm -p 3306:3306 -p 8080:81 -d -v /sys/fs/cgroup:/sys/fs/cgroup:ro --privileged -v '.getcwd().':/var/www/drupalvm/drupal:rw geerlingguy/drupal-vm');\""
         ],
         "stop-drupal-vm": [
             "docker stop drupal-vm"
