@@ -6,6 +6,8 @@ installed_extras:
   - drupalconsole
   - drush
   - java
+  - nodejs
+  - redis
   - mailhog
   - memcached
   - pimpmylog
@@ -39,3 +41,46 @@ php_post_max_size: "4096M"
 solr_version: "7.7.2"
 solr_xms: "1024M"
 solr_xmx: "2048M"
+
+mgmt_install_dir: /var/www/pacifica-mgmt/pacifica-metadata-mgmt-0.3.0/build
+
+apache_vhosts:
+  - servername: "{{ drupal_domain }}"
+    serveralias: "www.{{ drupal_domain }}"
+    documentroot: "{{ drupal_core_path }}"
+    extra_parameters: "{{ apache_vhost_php_fpm_parameters }}"
+
+  - servername: "adminer.{{ vagrant_hostname }}"
+    documentroot: "{{ adminer_install_dir }}"
+    extra_parameters: "{{ apache_vhost_php_fpm_parameters }}"
+
+  - servername: "xhprof.{{ vagrant_hostname }}"
+    documentroot: "{{ php_xhprof_html_dir }}"
+    extra_parameters: "{{ apache_vhost_php_fpm_parameters }}"
+
+  - servername: "pimpmylog.{{ vagrant_hostname }}"
+    documentroot: "{{ pimpmylog_install_dir }}"
+    extra_parameters: "{{ apache_vhost_php_fpm_parameters }}"
+
+  - servername: "{{ vagrant_ip }}"
+    serveralias: "dashboard.{{ vagrant_hostname }}"
+    documentroot: "{{ dashboard_install_dir }}"
+    extra_parameters: "{{ apache_vhost_php_fpm_parameters }}"
+
+  - servername: "mgmt.{{ vagrant_hostname }}"
+    documentroot: "{{ mgmt_install_dir }}"
+    extra_parameters: |
+      <Location /mdapi>
+        ProxyPass http://localhost:8121/
+        ProxyPassReverse http://localhost:8121/
+        Require all granted
+      </Location>
+
+apache_mods_enabled:
+  - expires.load
+  - headers.load
+  - ssl.load
+  - rewrite.load
+  - proxy.load
+  - proxy_fcgi.load
+  - proxy_http.load

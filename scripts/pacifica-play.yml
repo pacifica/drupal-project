@@ -1,0 +1,185 @@
+- hosts: localhost
+  become: yes
+  roles:
+    - role: geerlingguy.rabbitmq
+    - role: geerlingguy.postgresql
+      postgresql_version: 9.6
+      postgresql_databases:
+        - name: pacifica_metadata
+          owner: pacifica
+        - name: pacifica_notify
+          owner: pacifica
+      postgresql_users:
+        - name: pacifica
+          password: metadata
+          encrypted: false
+- hosts: localhost
+  become: yes
+  vars:
+    postgresql_version: 9.6
+  tasks:
+    - name: Install PostgreSQL Python Client
+      apt:
+        name:
+          - python3-psycopg2
+          - python3-virtualenv
+          - python3-dev
+          - libpq-dev
+          - rsyslog
+- hosts: localhost
+  become: yes
+  roles:
+    - role: pacifica.ansible_pacifica
+      pacifica_notify_config: &pacifica_notify_config
+        celery:
+          broker_url: redis://127.0.0.1:6379/0
+        database:
+          peewee_url: postgres://pacifica:metadata@127.0.0.1:5432/pacifica_notify
+      pacifica_available_services:
+        notify_backend:
+          virtualenv_python: /usr/bin/python3
+          ini_config: *pacifica_notify_config
+          env_vars:
+            NOTIFICATIONS_CPCONFIG: /opt/default/notify_backend-cp.ini
+            NOTIFICATIONS_CONFIG: /opt/default/notify_backend.ini
+        notify_frontend:
+          virtualenv_python: /usr/bin/python3
+          ini_config: *pacifica_notify_config
+          env_vars:
+            NOTIFICATIONS_CPCONFIG: /opt/default/notify_frontend-cp.ini
+            NOTIFICATIONS_CONFIG: /opt/default/notify_frontend.ini
+        metadata:
+          virtualenv_python: /usr/bin/python3
+      pacifica_enabled_services:
+        - notify_frontend
+        - notify_backend
+        - metadata
+- hosts: localhost
+  become: yes
+  tasks:
+    - name: Create Directories
+      file:
+        state: directory
+        path: /var/www/pacifica-mgmt
+        owner: root
+        group: root
+        mode: 0755
+    - name: Download Pacifica MD Mgmt
+      get_url:
+        dest: /var/www/pacifica-mgmt/source.tar.gz
+        owner: root
+        group: root
+        mode: 0600
+        checksum: sha256:6b4cf550010eb0ea8e8797012e9666420850c6142a3799bf998cb0f56670ed40
+        url: https://github.com/pacifica/pacifica-metadata-mgmt/archive/0.3.0.tar.gz
+    - name: Unpack Pacifica MD Mgmt
+      unarchive:
+        src: /var/www/pacifica-mgmt/source.tar.gz
+        dest: /var/www/pacifica-mgmt
+    - name: Install Pacifica MD Mgmt
+      command: npm install
+      args:
+        chdir: /var/www/pacifica-mgmt/pacifica-metadata-mgmt-0.3.0
+    - name: Build Pacifica MD Mgmt
+      command: npm run build
+      args:
+        chdir: /var/www/pacifica-mgmt/pacifica-metadata-mgmt-0.3.0
+    - name: Install Drupal Event Listener Requirements
+      pip:
+        name: "{{ item }}"
+        virtualenv: /opt/drupal-event-listener
+        virtualenv_python: /usr/bin/python3
+      loop:
+        - pika
+        - cherrypy
+        - cloudevents
+        - uwsgi
+    - name: Install Listener Script
+      copy:
+        src: /etc/ansible/drupal-event-listener.py
+        dest: /opt/drupal-event-listener/drupal-event-listener.py
+        owner: root
+        group: root
+        mode: 0755
+    - name: Install Fake Policy
+      copy:
+        src: /etc/ansible/drupal-policy.py
+        dest: /opt/drupal-event-listener/drupal-policy.py
+        owner: root
+        group: root
+        mode: 0755
+    - name: Create Startup Scripts
+      copy:
+        dest: "/opt/drupal-event-listener/drupal-{{ item.name }}"
+        content: |
+          #!/bin/bash
+          . /opt/drupal-event-listener/bin/activate
+          export HOST=localhost
+          exec -a {{ item.name }} uwsgi \
+            --logger syslog:{{ item.name }} \
+            --http-socket :{{ item.port }} \
+            --master \
+            --die-on-term \
+            --buffer-size 12288 \
+            --wsgi-file /opt/drupal-event-listener/drupal-{{ item.name }}.py
+        owner: root
+        group: root
+        mode: 0755
+      loop:
+        - name: policy
+          port: 8181
+        - name: event-listener
+          port: 8080
+    - name: Create Service Script
+      copy:
+        dest: "/etc/systemd/system/drupal-{{ item }}.service"
+        owner: root
+        group: root
+        mode: 0644
+        content: |
+          [Unit]
+          Description=Starts and manages the Pacifica based {{ item }} service
+          After=network.target
+          
+          [Service]
+          ExecStart=/opt/drupal-event-listener/drupal-{{ item }}
+          ExecReload=/bin/kill -HUP $MAINPID
+          KillSignal=TERM
+          Restart=on-failure
+          SyslogIdentifier=metadata
+          
+          [Install]
+          WantedBy=multi-user.target
+      loop:
+        - event-listener
+        - policy
+      register: services_created
+      notify:
+        - reload systemd
+        - restart drupal service
+    - name: Make sure Drupal services are started
+      service:
+        name: "drupal-{{ item }}"
+        state: started
+      loop:
+        - event-listener
+        - policy
+    - name: Make sure rsyslog is started
+      service:
+        name: rsyslog
+        state: started
+    - name: Check Subscription
+      command: "curl http://localhost:8070/eventmatch"
+      register: eventmatch_result
+    - name: Create Subscription
+      when: '"crud-updates" not in eventmatch_result.stdout'
+      command: "curl -X POST -H 'Content-Type: application/json' -H 'Http-Remote-User: root' -d'{\"name\":\"crud-updates\",\"jsonpath\":\"$[\\\"data\\\"]\",\"target_url\":\"http://localhost:8080\"}' http://localhost:8070/eventmatch"
+  handlers:
+    - name: reload systemd
+      command: systemctl daemon-reload
+    - name: restart drupal service
+      when: item.changed
+      with_items: services_created.results
+      service:
+        name: "drupal-{{ item }}"
+        state: restarted
