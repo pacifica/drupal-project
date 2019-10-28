@@ -1,3 +1,46 @@
+          [Install]
+          WantedBy=multi-user.target
+      loop:
+        - event-listener
+        - policy
+      register: services_created
+      notify:
+        - reload systemd
+        - restart drupal service
+    - name: Make sure Drupal services are started
+      service:
+        name: "drupal-{{ item }}"
+        state: started
+      loop:
+        - event-listener
+        - policy
+    - name: Make sure rsyslog is started
+      service:
+        name: rsyslog
+        state: started
+    - name: Check Subscription
+      command: "curl http://localhost:8070/eventmatch"
+      register: eventmatch_result
+    - name: Create Subscription
+      when: '"crud-updates" not in eventmatch_result.stdout'
+      command: "curl -X POST -H 'Content-Type: application/json' -H 'Http-Remote-User: root' -d'{\"name\":\"crud-updates\",\"jsonpath\":\"$[\\\"data\\\"]\",\"target_url\":\"http://localhost:8080\"}' http://localhost:8070/eventmatch"
+  handlers:
+    - name: reload systemd
+      command: systemctl daemon-reload
+    - name: restart drupal service
+      when: item.changed
+      with_items: services_created.results
+      service:
+        name: "drupal-{{ item }}"
+        state: restarted
+
+          [Service]
+          ExecStart=/opt/drupal-event-listener/drupal-{{ item }}
+          ExecReload=/bin/kill -HUP $MAINPID
+          KillSignal=TERM
+          Restart=on-failure
+          SyslogIdentifier=metadata
+
 - hosts: localhost
   become: yes
   roles:
@@ -140,46 +183,3 @@
           [Unit]
           Description=Starts and manages the Pacifica based {{ item }} service
           After=network.target
-          
-          [Service]
-          ExecStart=/opt/drupal-event-listener/drupal-{{ item }}
-          ExecReload=/bin/kill -HUP $MAINPID
-          KillSignal=TERM
-          Restart=on-failure
-          SyslogIdentifier=metadata
-          
-          [Install]
-          WantedBy=multi-user.target
-      loop:
-        - event-listener
-        - policy
-      register: services_created
-      notify:
-        - reload systemd
-        - restart drupal service
-    - name: Make sure Drupal services are started
-      service:
-        name: "drupal-{{ item }}"
-        state: started
-      loop:
-        - event-listener
-        - policy
-    - name: Make sure rsyslog is started
-      service:
-        name: rsyslog
-        state: started
-    - name: Check Subscription
-      command: "curl http://localhost:8070/eventmatch"
-      register: eventmatch_result
-    - name: Create Subscription
-      when: '"crud-updates" not in eventmatch_result.stdout'
-      command: "curl -X POST -H 'Content-Type: application/json' -H 'Http-Remote-User: root' -d'{\"name\":\"crud-updates\",\"jsonpath\":\"$[\\\"data\\\"]\",\"target_url\":\"http://localhost:8080\"}' http://localhost:8070/eventmatch"
-  handlers:
-    - name: reload systemd
-      command: systemctl daemon-reload
-    - name: restart drupal service
-      when: item.changed
-      with_items: services_created.results
-      service:
-        name: "drupal-{{ item }}"
-        state: restarted
