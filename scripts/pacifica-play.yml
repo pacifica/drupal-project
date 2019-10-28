@@ -140,14 +140,12 @@
           [Unit]
           Description=Starts and manages the Pacifica based {{ item }} service
           After=network.target
-          
           [Service]
           ExecStart=/opt/drupal-event-listener/drupal-{{ item }}
           ExecReload=/bin/kill -HUP $MAINPID
           KillSignal=TERM
           Restart=on-failure
           SyslogIdentifier=metadata
-          
           [Install]
           WantedBy=multi-user.target
       loop:
