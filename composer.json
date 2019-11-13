@@ -65,7 +65,7 @@
         "pacifica-dev": {
             "no-api": true,
             "type": "vcs",
-            "url": "https://github.com/pacifica/pacifica-drupal-module.git"
+            "url": "https://git.drupalcode.org/project/pacifica.git"
         },
         "pacifica-profiles-dev": {
             "no-api": true,
