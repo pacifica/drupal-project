@@ -9,9 +9,6 @@
     "autoload": {
         "classmap": [
             "scripts/composer/ScriptHandler.php"
-        ],
-        "files": [
-            "load.environment.php"
         ]
     },
     "config": {
@@ -24,9 +21,8 @@
     "extra": {
         "composer-exit-on-patch-failure": true,
         "drupal-scaffold": {
-            "initial": {
-                ".editorconfig": "../.editorconfig",
-                ".gitattributes": "../.gitattributes"
+            "locations": {
+                "web-root": "web/"
             }
         },
         "installer-paths": {
@@ -42,11 +38,17 @@
             "web/modules/contrib/{$name}": [
                 "type:drupal-module"
             ],
+            "web/modules/custom/{$name}": [
+                "type:drupal-custom-module"
+            ],
             "web/profiles/contrib/{$name}": [
                 "type:drupal-profile"
             ],
             "web/themes/contrib/{$name}": [
                 "type:drupal-theme"
+            ],
+            "web/themes/custom/{$name}": [
+                "type:drupal-custom-theme"
             ]
         },
         "patchLevel": {
@@ -81,21 +83,16 @@
     "require": {
         "php": ">=7.0.8",
         "composer/installers": "^1.2",
-        "cweagans/composer-patches": "^1.6.5",
-        "drupal-composer/drupal-scaffold": "^2.5",
-        "drupal/console": "^1.0.2",
-        "drupal/core": "^8.7.0",
-        "drush/drush": "^9.0.0",
+        "drupal/core-composer-scaffold": "^8.8",
+        "drupal/core-project-message": "^8.8",
+        "drupal/core-recommended": "^8.8",
+        "drush/drush": "^10",
         "pacifica/pacifica": "dev-8.x-1.x",
         "pacifica/pacifica_profiles": "dev-8.x-1.x",
-        "pacifica/pacifica_theme": "dev-8.x-1.x",
-        "vlucas/phpdotenv": "^2.4",
-        "webflo/drupal-finder": "^1.0.0",
-        "webmozart/path-util": "^2.3",
-        "zaporylie/composer-drupal-optimizations": "^1.0"
+        "pacifica/pacifica_theme": "dev-8.x-1.x"
     },
     "require-dev": {
-        "webflo/drupal-core-require-dev": "^8.7.0"
+        "drupal/core-dev": "^8.8"
     },
     "scripts": {
         "configure-drupal-vm": [
@@ -105,18 +102,6 @@
         "nuke-testing": [
             "@stop-drupal-vm",
             "@remove-drupal-vm"
-        ],
-        "post-install-cmd": [
-            "DrupalProject\\composer\\ScriptHandler::createRequiredFiles"
-        ],
-        "post-update-cmd": [
-            "DrupalProject\\composer\\ScriptHandler::createRequiredFiles"
-        ],
-        "pre-install-cmd": [
-            "DrupalProject\\composer\\ScriptHandler::checkComposerVersion"
-        ],
-        "pre-update-cmd": [
-            "DrupalProject\\composer\\ScriptHandler::checkComposerVersion"
         ],
         "remove-drupal-vm": [
             "docker rm drupal-vm"
