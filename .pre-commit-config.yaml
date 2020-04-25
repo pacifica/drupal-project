@@ -1,6 +1,6 @@
 repos:
--   repo: git://github.com/pre-commit/pre-commit-hooks
-    rev: v2.2.3
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.5.0
     hooks:
             -   id: trailing-whitespace
             -   id: check-merge-conflict
@@ -22,8 +22,8 @@ repos:
                 files: '.yaml$'
             -   id: check-symlinks
             -   id: detect-private-key
--   repo: git://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.1.6
+-   repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.1.7
     hooks:
     -   id: remove-tabs
     -   id: remove-crlf
