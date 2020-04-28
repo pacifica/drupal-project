@@ -86,13 +86,16 @@
         "drupal/core-composer-scaffold": "^8.8",
         "drupal/core-project-message": "^8.8",
         "drupal/core-recommended": "^8.8",
+        "drupal/key_auth": "^1.0",
+        "drupal/restui": "^1.18",
         "drush/drush": "^10",
-        "pacifica/pacifica": "dev-8.x-1.x",
-        "pacifica/pacifica_profiles": "dev-8.x-1.x",
-        "pacifica/pacifica_theme": "dev-8.x-1.x"
+        "pacifica/pacifica_profiles": "dev-8.x-1.x"
     },
     "require-dev": {
-        "drupal/core-dev": "^8.8"
+        "drupal/core-dev": "^8.8",
+        "drupal/devel": "^2.1",
+        "drupal/devel_generate": "^2.1",
+        "drupal/features": "^3.8"
     },
     "scripts": {
         "configure-drupal-vm": [
