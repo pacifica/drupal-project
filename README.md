@@ -1,12 +1,12 @@
 # Composer template for Drupal projects
 
-[![Build Status](https://travis-ci.org/pacifica/drupal-project.svg?branch=8.x)](https://travis-ci.org/pacifica/drupal-project)
+[![Build Status](https://travis-ci.org/pacifica/drupal-project.svg?branch=9.x)](https://travis-ci.org/pacifica/drupal-project)
 
 This project template provides a starter kit for managing your site
 dependencies with [Composer](https://getcomposer.org/).
 
 If you want to know how to use it as replacement for
-[Drush Make](https://github.com/drush-ops/drush/blob/8.x/docs/make.md) visit
+[Drush Make](https://github.com/drush-ops/drush/blob/9.x/docs/make.md) visit
 the [Documentation on drupal.org](https://www.drupal.org/node/2471553).
 
 ## Usage
@@ -21,12 +21,12 @@ After that you can create the project in one of two ways.
 
 For site building using the versioned code:
 ```
-composer create-project pacifica/drupal-project:8.x-dev some-dir --no-interaction
+composer create-project pacifica/drupal-project:9.x-dev some-dir --no-interaction
 ```
 
 For developing new platform features and keep git repositories:
 ```
-composer create-project pacifica/drupal-project:8.x-vcs-dev some-dir --no-interaction --keep-vcs
+composer create-project pacifica/drupal-project:9.x-vcs-dev some-dir --no-interaction --keep-vcs
 ```
 
 With `composer require ...` you can download new dependencies to your
