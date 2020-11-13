@@ -78,6 +78,40 @@
             "no-api": true,
             "type": "vcs",
             "url": "https://github.com/pacifica/pacifica-drupal-theme.git"
+        },
+        "jsoneditor": {
+            "type": "package",
+            "package": {
+                "name": "josdejong/jsoneditor",
+                "version": "v5.29.1",
+                "type": "drupal-library",
+                "dist": {
+                    "url": "https://github.com/josdejong/jsoneditor/archive/v5.29.1.zip",
+                    "type": "zip"
+                },
+                "source": {
+                    "url": "https://github.com/josdejong/jsoneditor",
+                    "type": "git",
+                    "reference": "v5.29.1"
+                }
+            }
+        },
+        "jsonview": {
+            "type": "package",
+            "package": {
+                "name": "yesmeck/jquery-jsonview",
+                "version": "v1.2.3",
+                "type": "drupal-library",
+                "dist": {
+                    "url": "https://github.com/yesmeck/jquery-jsonview/archive/v1.2.3.zip",
+                    "type": "zip"
+                },
+                "source": {
+                    "url": "https://github.com/yesmeck/jquery-jsonview",
+                    "type": "git",
+                    "reference": "v1.2.3"
+                }
+            }
         }
     },
     "require": {
@@ -86,7 +120,7 @@
         "drupal/core-composer-scaffold": "^8.8",
         "drupal/core-project-message": "^8.8",
         "drupal/core-recommended": "^8.8",
-        "drupal/key_auth": "^1.0",
+        "drupal/key_auth": "^1.1",
         "drupal/restui": "^1.18",
         "drush/drush": "^10",
         "pacifica/pacifica_profiles": "dev-8.x-1.x"
