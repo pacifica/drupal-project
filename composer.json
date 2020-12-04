@@ -17,7 +17,7 @@
     "conflict": {
         "drupal/drupal": "*"
     },
-    "description": "Project template for Drupal 8 Pacifica projects using composer",
+    "description": "Project template for Drupal 9 Pacifica projects using composer",
     "extra": {
         "composer-exit-on-patch-failure": true,
         "drupal-scaffold": {
@@ -87,9 +87,10 @@
         "drupal/core-project-message": "^9",
         "drupal/core-recommended": "^9",
         "drupal/key_auth": "^1.0",
+        "drupal/openid_connect": "^1.0@RC",
         "drupal/restui": "^1.18",
         "drush/drush": "^10",
-        "pacifica/pacifica_profiles": "dev-9.x-1.x"
+        "pacifica/pacifica_profiles": "dev-9.x-1.x-vcs"
     },
     "require-dev": {
         "drupal/core-dev": "^9",
